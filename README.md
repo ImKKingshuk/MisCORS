@@ -1,6 +1,6 @@
 # MisCORS
 
-MisCORS is a command-line tool crafted in Bash for uncovering Cross-Origin Resource Sharing (CORS) misconfigurations, enhancing your web application security assessments.
+MisCORS - Unleash CORS Misconfigurations Like a Digital Phantom! 🌐✨ Harness the power of MisCORS to silently unveil vulnerabilities in Cross-Origin Resource Sharing. Stealthily analyze web defenses, expose misconfigurations, and empower your security journey. 🕵️‍♂️🔓 Dive into the shadows of web security with MisCORS.
 
 ## What's New (v1.0.1)
 
