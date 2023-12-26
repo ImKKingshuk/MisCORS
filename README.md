@@ -27,7 +27,7 @@ MisCORS - Unleash CORS Misconfigurations Like a Digital Phantom! 🌐✨ Harness
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/MisCORS.git
+   git clone https://github.com/ImKKingshuk/MisCORS.git
    cd MisCORS
 
    ```
