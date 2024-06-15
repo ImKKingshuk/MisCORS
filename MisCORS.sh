@@ -6,27 +6,33 @@ R='\033[0;31m'
 G='\033[0;32m'
 O='\033[0;33m'
 B='\033[0;34m'
-Y='\033[0;38m'
 C='\033[0;36m'
 W='\033[0;37m'
 
 
-function banner() {
-    echo "******************************************"
-    echo "*                MisCORS                 *"
-    echo "*    CORS Hunter / Vulnerability Tool    *"
-    echo "*      ----------------------------      *"
-    echo "*                        by @ImKKingshuk *"
-    echo "* Github- https://github.com/ImKKingshuk *"
-    echo "******************************************"
+print_banner() {
+    local banner=(
+        "******************************************"
+        "*                  MisCORS               *"
+        "*     CORS Hunter / Vulnerability Tool   *"
+        "*                  v1.2.1                *"
+        "*      ----------------------------      *"
+        "*                        by @ImKKingshuk *"
+        "* Github- https://github.com/ImKKingshuk *"
+        "******************************************"
+    )
+    local width=$(tput cols)
+    for line in "${banner[@]}"; do
+        printf "%*s\n" $(((${#line} + width) / 2)) "$line"
+    done
     echo
 }
 
 
-function check_internet() {
+check_internet() {
     echo -e "${O}[+] Checking Internet Connectivity\n"
     sleep 2
-    if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss')" != "" ]]; then
+    if ! ping -c 1 8.8.8.8 &> /dev/null; then
         echo "No Internet Connection"
         exit 1
     else
@@ -36,18 +42,16 @@ function check_internet() {
 }
 
 
-function cors_check_advanced() {
+cors_check_advanced() {
     local site="$1"
     local output_format="$2"
     local output_file="output.$output_format"
-    local timeout=5  
+    local timeout=5
 
-    echo -e -n "${CNC}\n[+] Searching For CORS Misconfiguration on $site\n"
+    echo -e "${C}\n[+] Searching For CORS Misconfiguration on $site\n"
     
-  
-    ICT=$(curl -s --max-time "$timeout" -Iv "$site" -H "Origin: evil.com" 2>&1)
-
-   
+    local response=$(curl -s --max-time "$timeout" -Iv "$site" -H "Origin: evil.com" 2>&1)
+    
     case $output_format in
         "json")
             echo -e "{ \"url\": \"$site\", \"result\": {" > "$output_file"
@@ -56,27 +60,26 @@ function cors_check_advanced() {
             echo -e "\nURL: $site" > "$output_file"
             ;;
     esac
-    echo "$ICT" >> "$output_file"
 
-  
-    if grep -q evil <<<"$ICT"; then
+    echo "$response" >> "$output_file"
+
+    if grep -q "evil.com" <<< "$response"; then
         echo -e "${R}URL: $site  [Vulnerable]\n"
-        grep -e evil -e access-control-allow-credentials: "$output_file"
+        grep -e "evil.com" -e "access-control-allow-credentials:" "$output_file"
     else
         echo -e "${G}URL: $site  [Not Vulnerable]\n"
     fi
 
     case $output_format in
         "json")
-            echo -e "}}}" >> "$output_file"
+            echo -e "}}" >> "$output_file"
             ;;
     esac
 }
 
 
-function interactive_mode() {
+interactive_mode() {
     local option
-
     echo -e "${O}[+] Interactive Mode"
     echo -e "${O}[+] Options:"
     echo -e "${O}[1] Perform CORS check"
@@ -86,8 +89,7 @@ function interactive_mode() {
 
     case $option in
         1)
-            echo -e -n "${CNC}\n[+] Enter Site (e.g https://site-url.com) : "
-            read -r site
+            read -r -p "${C}\n[+] Enter Site (e.g https://site-url.com): " site
 
             echo -e "${O}[+] Choose Output Format:"
             echo -e "${O}[1] Normal text"
@@ -96,15 +98,11 @@ function interactive_mode() {
             read -r -p "[?] Choose an option: " output_option
 
             case $output_option in
-                1)
-                    output_format="txt"
-                    ;;
-                2)
-                    output_format="json"
-                    ;;
-                *)
+                1) output_format="txt" ;;
+                2) output_format="json" ;;
+                *) 
                     echo -e "${R}[!] Invalid output format option. Defaulting to normal text."
-                    output_format="txt"
+                    output_format="txt" 
                     ;;
             esac
 
@@ -124,11 +122,11 @@ function interactive_mode() {
 
 trap 'printf "\e[1;77m \n Ctrl+C was pressed, exiting...\n\n \e[0m"; exit 0' 2
 
-banner
-check_internet
 
+print_banner
+check_internet
 clear
-banner
+print_banner
 
 
 while true; do
